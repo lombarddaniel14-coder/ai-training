@@ -1,0 +1,907 @@
+{
+  "schemaVersion": 4,
+  "kind": "component",
+  "name": "holo-wall-rig",
+  "created": "2026-08-12T00:00:00Z",
+  "target": {
+    "parent": "root",
+    "placement": "auto"
+  },
+  "materials": {
+    "alu": {
+      "name": "Aluminium extrusion 60x60",
+      "color": "#b8bcc0",
+      "metalness": 0.85,
+      "roughness": 0.32
+    },
+    "desk": {
+      "name": "Desk laminate",
+      "color": "#6b4f34",
+      "metalness": 0,
+      "roughness": 0.62
+    },
+    "steel": {
+      "name": "Steel panel",
+      "color": "#3a3d42",
+      "metalness": 0.8,
+      "roughness": 0.34
+    },
+    "mat": {
+      "name": "Projection mat (matte grey)",
+      "color": "#d4d6d2",
+      "metalness": 0,
+      "roughness": 0.95
+    },
+    "glass-film": {
+      "name": "Glass wall + holographic rear-projection film",
+      "color": "#a8d8e8",
+      "metalness": 0,
+      "roughness": 0.06,
+      "opacity": 0.18
+    },
+    "proj": {
+      "name": "Projector shell",
+      "color": "#2b2e33",
+      "metalness": 0.2,
+      "roughness": 0.33
+    },
+    "sensor": {
+      "name": "Sensor housing",
+      "color": "#17191c",
+      "metalness": 0.35,
+      "roughness": 0.3
+    }
+  },
+  "root": {
+    "id": "holo-wall-rig",
+    "name": "Holographic Wall + Interactive Mat Rig",
+    "type": "assembly",
+    "meta": {
+      "references": [
+        {
+          "title": "Pro Display ClearView holographic rear projection film",
+          "url": "https://prodisplay.com/projection-screens/rear-projection/clearview-holographic-display/",
+          "accessed": "2026-08-12",
+          "usedFor": "glass wall: >=85% transmission, gain 1.2-1.8, 120H/60V viewing"
+        },
+        {
+          "title": "Ultraleap - How big is the Leap Motion Controller 2",
+          "url": "https://support.ultraleap.com/hc/en-us/articles/12853399254813-How-big-is-the-Leap-Motion-Controller-2",
+          "accessed": "2026-08-12",
+          "usedFor": "84 x 20 x 12 mm, 160x160 FOV, 10-110 cm range - the pinch detector"
+        },
+        {
+          "title": "Orbbec Femto Bolt hardware specifications",
+          "url": "https://www.orbbec.com/documentation/femto-bolt-hardware-specifications/",
+          "accessed": "2026-08-12",
+          "usedFor": "115 x 40 x 65 mm, WFOV 120x120, 0.25-5.46 m - both depth volumes"
+        },
+        {
+          "title": "Microsoft Research - LightSpace",
+          "url": "https://www.microsoft.com/en-us/research/project/lightspace/",
+          "accessed": "2026-08-12",
+          "usedFor": "multiple overlapping depth volumes so a hand stays tracked BETWEEN surfaces - the precedent for the mat-to-wall drag"
+        },
+        {
+          "title": "Sony Xperia Touch - IR array + 60 fps camera touch detection",
+          "url": "https://www.photoxels.com/sony-xperia-touch-is-an-interactive-projector-that-combines-infrared-light-array-with-60fps-camera-capture-to-turn-any-flat-surface-into-a-23-inch-hd-touchscreen-for-apps-games-online-video-chat/",
+          "accessed": "2026-08-12",
+          "usedFor": "850 nm IR plane grazing the mat for true touch vs hover"
+        }
+      ],
+      "anchorProportions": [
+        "desk top height = 740 mm (seated standard)",
+        "mat = 1220 x 762 mm = 4ft 0in x 2ft 6in, aspect 1.601:1 == native 16:10 (WUXGA), so the projector maps 1:1 with no letterboxing",
+        "rear UST throw ratio 0.25 -> lens sits exactly 450 mm behind the 1800 mm wide glass wall",
+        "overhead projector drop = 1135 mm over a 1220 mm image -> 0.93:1 short throw",
+        "glass wall bottom at y=850, i.e. 110 mm clear above the desktop, so it reads as a wall surface rather than a monitor",
+        "transfer corridor = mat back edge z=-541 to glass wall z=-690, i.e. a 149 mm reach plus a 110 mm lift. The two ToF volumes must both cover it or a dragged object drops out of tracking mid-flight"
+      ],
+      "calloutLayout": "One column per side: elbows at x=-1500 and x=+1500, all on a common z=-300 plane, fanned on a 320 mm vertical ladder from y=2900 down. Rows are ordered by anchor height so no leader line crosses another inside a column, and the shared elbow plane is what stops them piling up under the iso perspective. Anchors are LOCAL to each part, so moving a part takes its callout with it.",
+      "interactionModel": "Two display surfaces treated as one desktop, like dual monitors. Surface A = the projected mat (touch via the IR plane). Surface B = the glass wall (rear-projected). A pinch is detected by the Leap in the near field, the hand is then handed off between the two ToF volumes as it lifts off the mat and moves back toward the wall, and the object follows. Software is out of scope here; this models the hardware that makes it possible."
+    },
+    "children": [
+      {
+        "id": "desk-top",
+        "name": "Desk top",
+        "type": "part",
+        "shape": "box",
+        "params": {
+          "size": [
+            1700,
+            30,
+            1000
+          ]
+        },
+        "transform": {
+          "position": [
+            0,
+            725,
+            -160
+          ]
+        },
+        "material": "desk",
+        "notes": "1700 x 1000 work surface, top face at y=740. Extended forward only, so the rear frame stays clear of the top",
+        "annotation": {
+          "label": "Desk top",
+          "detail": "1700 x 1000 mm, top 740",
+          "anchor": [
+            -850,
+            0,
+            0
+          ],
+          "offset": [
+            -650,
+            255,
+            -140
+          ],
+          "side": "left"
+        }
+      },
+      {
+        "id": "desk-leg-l",
+        "name": "Desk leg panel L",
+        "type": "part",
+        "shape": "csg",
+        "params": {
+          "op": "subtract",
+          "base": {
+            "shape": "box",
+            "params": {
+              "size": [
+                50,
+                710,
+                920
+              ]
+            }
+          },
+          "tools": [
+            {
+              "shape": "box",
+              "params": {
+                "size": [
+                  80,
+                  520,
+                  720
+                ]
+              },
+              "transform": {
+                "position": [
+                  0,
+                  -40,
+                  0
+                ]
+              }
+            }
+          ]
+        },
+        "transform": {
+          "position": [
+            -790,
+            355,
+            -160
+          ]
+        },
+        "material": "steel",
+        "notes": "steel panel leg with a 520x720 cutout; tool pierces fully in X (80 > 50)",
+        "annotation": {
+          "label": "Leg panel (left)",
+          "detail": "50 mm steel, 520x720 cut",
+          "offset": [
+            -710,
+            -15,
+            -140
+          ],
+          "side": "left"
+        }
+      },
+      {
+        "id": "desk-leg-r",
+        "name": "Desk leg panel R",
+        "type": "part",
+        "shape": "csg",
+        "params": {
+          "op": "subtract",
+          "base": {
+            "shape": "box",
+            "params": {
+              "size": [
+                50,
+                710,
+                920
+              ]
+            }
+          },
+          "tools": [
+            {
+              "shape": "box",
+              "params": {
+                "size": [
+                  80,
+                  520,
+                  720
+                ]
+              },
+              "transform": {
+                "position": [
+                  0,
+                  -40,
+                  0
+                ]
+              }
+            }
+          ]
+        },
+        "transform": {
+          "position": [
+            790,
+            355,
+            -160
+          ]
+        },
+        "material": "steel",
+        "notes": "mirror of desk-leg-l",
+        "annotation": {
+          "label": "Leg panel (right)",
+          "detail": "mirror of the left",
+          "offset": [
+            710,
+            -15,
+            -140
+          ],
+          "side": "right"
+        }
+      },
+      {
+        "id": "projection-mat",
+        "name": "Interactive projection mat",
+        "type": "part",
+        "shape": "box",
+        "params": {
+          "size": [
+            1220,
+            8,
+            762
+          ]
+        },
+        "transform": {
+          "position": [
+            0,
+            742,
+            -160
+          ]
+        },
+        "material": "mat",
+        "notes": "SURFACE A. 1220 x 762 mm = 4ft x 2ft6in of matte grey projection surface, 8 mm thick, laid on the desktop. Aspect 1.601:1 matches WUXGA exactly so the projected image fills it edge to edge",
+        "annotation": {
+          "label": "SURFACE A - the mat",
+          "detail": "1220 x 762 mm (4ft x 2ft6)\nnative 16:10, no letterbox",
+          "anchor": [
+            -610,
+            0,
+            0
+          ],
+          "offset": [
+            -890,
+            558,
+            -140
+          ],
+          "side": "left",
+          "color": "#1f6f4a"
+        }
+      },
+      {
+        "id": "ir-touch-bar",
+        "name": "IR touch-plane bar",
+        "type": "part",
+        "shape": "box",
+        "params": {
+          "size": [
+            1320,
+            26,
+            30
+          ]
+        },
+        "transform": {
+          "position": [
+            0,
+            753,
+            -575
+          ]
+        },
+        "material": "sensor",
+        "notes": "850 nm line-laser module + bandpass IR camera. Fans a plane ~2 mm above the mat across its full width; a fingertip breaking the plane scatters IR and registers as a real touch rather than a hover",
+        "annotation": {
+          "label": "IR touch plane",
+          "detail": "850 nm laser + IR camera\n2 mm plane = real touch",
+          "anchor": [
+            -660,
+            0,
+            0
+          ],
+          "offset": [
+            -840,
+            867,
+            275
+          ],
+          "side": "left"
+        }
+      },
+      {
+        "id": "upright-l",
+        "name": "Wall frame upright L",
+        "type": "part",
+        "shape": "box",
+        "params": {
+          "size": [
+            60,
+            2100,
+            60
+          ]
+        },
+        "transform": {
+          "position": [
+            -950,
+            1050,
+            -720
+          ]
+        },
+        "material": "alu",
+        "notes": "60x60 aluminium extrusion, floor to 2100 mm. Stepped up from 40x40 because the pane is now 1800 mm wide and 2100 mm tall overall",
+        "annotation": {
+          "label": "Frame upright",
+          "detail": "60 x 60 extrusion, 2100",
+          "anchor": [
+            0,
+            810,
+            0
+          ],
+          "offset": [
+            -550,
+            400,
+            420
+          ],
+          "side": "left"
+        }
+      },
+      {
+        "id": "upright-r",
+        "name": "Wall frame upright R",
+        "type": "part",
+        "shape": "box",
+        "params": {
+          "size": [
+            60,
+            2100,
+            60
+          ]
+        },
+        "transform": {
+          "position": [
+            950,
+            1050,
+            -720
+          ]
+        },
+        "material": "alu",
+        "notes": "mirror of upright-l",
+        "annotation": {
+          "label": "Frame upright (right)",
+          "detail": "carries wall + gantry",
+          "anchor": [
+            0,
+            350,
+            0
+          ],
+          "offset": [
+            550,
+            -100,
+            420
+          ],
+          "side": "right"
+        }
+      },
+      {
+        "id": "gantry-arm-l",
+        "name": "Gantry arm L",
+        "type": "part",
+        "shape": "box",
+        "params": {
+          "size": [
+            60,
+            60,
+            850
+          ]
+        },
+        "transform": {
+          "position": [
+            -950,
+            2070,
+            -325
+          ]
+        },
+        "material": "alu",
+        "notes": "cantilevers forward over the mat, z -750 to +100",
+        "annotation": {
+          "label": "Gantry arm",
+          "detail": "850 mm cantilever",
+          "offset": [
+            -550,
+            830,
+            25
+          ],
+          "side": "left"
+        }
+      },
+      {
+        "id": "gantry-arm-r",
+        "name": "Gantry arm R",
+        "type": "part",
+        "shape": "box",
+        "params": {
+          "size": [
+            60,
+            60,
+            850
+          ]
+        },
+        "transform": {
+          "position": [
+            950,
+            2070,
+            -325
+          ]
+        },
+        "material": "alu",
+        "notes": "mirror of gantry-arm-l",
+        "annotation": {
+          "label": "Gantry arm (right)",
+          "detail": "the pair hold the procam",
+          "offset": [
+            550,
+            830,
+            25
+          ],
+          "side": "right"
+        }
+      },
+      {
+        "id": "gantry-cross",
+        "name": "Gantry cross beam",
+        "type": "part",
+        "shape": "box",
+        "params": {
+          "size": [
+            1900,
+            60,
+            60
+          ]
+        },
+        "transform": {
+          "position": [
+            0,
+            2070,
+            70
+          ]
+        },
+        "material": "alu",
+        "notes": "ties the arms, carries the depth camera",
+        "annotation": {
+          "label": "Gantry cross beam",
+          "detail": "1900 mm tie beam",
+          "anchor": [
+            300,
+            0,
+            0
+          ],
+          "offset": [
+            1200,
+            510,
+            -370
+          ],
+          "side": "right"
+        }
+      },
+      {
+        "id": "glass-wall",
+        "name": "Holographic glass wall",
+        "type": "part",
+        "shape": "box",
+        "params": {
+          "size": [
+            1800,
+            1100,
+            10
+          ]
+        },
+        "transform": {
+          "position": [
+            0,
+            1400,
+            -690
+          ]
+        },
+        "material": "glass-film",
+        "notes": "SURFACE B. 1800 x 1100 mm of 10 mm toughened glass laminated with rear-projection holographic film, spanning y=850 to y=1950. Wall-scale, clear when the projector is off",
+        "annotation": {
+          "label": "SURFACE B - glass wall",
+          "detail": "1800 x 1100, 10 mm glass\nrear-projection film\nclear when projector off",
+          "anchor": [
+            -900,
+            0,
+            0
+          ],
+          "offset": [
+            -600,
+            540,
+            390
+          ],
+          "side": "left",
+          "color": "#1f6f4a"
+        }
+      },
+      {
+        "id": "wall-bezel",
+        "name": "Glass wall bezel",
+        "type": "part",
+        "shape": "csg",
+        "params": {
+          "op": "subtract",
+          "base": {
+            "shape": "box",
+            "params": {
+              "size": [
+                1900,
+                1180,
+                24
+              ]
+            }
+          },
+          "tools": [
+            {
+              "shape": "box",
+              "params": {
+                "size": [
+                  1796,
+                  1096,
+                  48
+                ]
+              }
+            }
+          ]
+        },
+        "transform": {
+          "position": [
+            0,
+            1400,
+            -690
+          ]
+        },
+        "material": "alu",
+        "notes": "aluminium bezel clamping the pane, running out to the centreline of each upright",
+        "annotation": {
+          "label": "Wall bezel",
+          "detail": "clamps pane to uprights",
+          "anchor": [
+            -950,
+            590,
+            0
+          ],
+          "offset": [
+            -550,
+            590,
+            390
+          ],
+          "side": "left"
+        }
+      },
+      {
+        "id": "rear-shroud",
+        "name": "Rear bay shroud",
+        "type": "part",
+        "shape": "csg",
+        "params": {
+          "op": "subtract",
+          "base": {
+            "shape": "box",
+            "params": {
+              "size": [
+                1000,
+                840,
+                1050
+              ]
+            }
+          },
+          "tools": [
+            {
+              "shape": "box",
+              "params": {
+                "size": [
+                  920,
+                  780,
+                  1010
+                ]
+              },
+              "transform": {
+                "position": [
+                  0,
+                  -30,
+                  60
+                ]
+              }
+            }
+          ]
+        },
+        "transform": {
+          "position": [
+            0,
+            420,
+            -1225
+          ]
+        },
+        "material": "steel",
+        "notes": "matte-black hood sealing the rear bay, top at y=840 - deliberately just under the glass wall's bottom edge at 850 so it reads as a low cabinet behind the wall rather than a wardrobe. Kills stray light so the rear-projected image holds contrast, and ties the bay to the wall frame",
+        "annotation": {
+          "label": "Rear bay shroud",
+          "detail": "matte black, top 840\nkills stray light",
+          "anchor": [
+            -500,
+            0,
+            0
+          ],
+          "offset": [
+            -1000,
+            240,
+            925
+          ],
+          "side": "left"
+        }
+      },
+      {
+        "id": "proj-plinth",
+        "name": "Rear projector plinth",
+        "type": "part",
+        "shape": "csg",
+        "params": {
+          "op": "subtract",
+          "base": {
+            "shape": "box",
+            "params": {
+              "size": [
+                920,
+                560,
+                700
+              ]
+            }
+          },
+          "tools": [
+            {
+              "shape": "box",
+              "params": {
+                "size": [
+                  800,
+                  420,
+                  760
+                ]
+              },
+              "transform": {
+                "position": [
+                  0,
+                  -50,
+                  0
+                ]
+              }
+            }
+          ]
+        },
+        "transform": {
+          "position": [
+            0,
+            280,
+            -1345
+          ]
+        },
+        "material": "steel",
+        "notes": "equipment plinth seated against the shroud back wall, top face at y=560",
+        "annotation": {
+          "label": "Projector plinth",
+          "detail": "top 560, open front",
+          "anchor": [
+            460,
+            0,
+            0
+          ],
+          "offset": [
+            1040,
+            -260,
+            1045
+          ],
+          "side": "right"
+        }
+      },
+      {
+        "id": "rear-ust",
+        "name": "Rear UST projector (wall)",
+        "type": "part",
+        "shape": "box",
+        "params": {
+          "size": [
+            750,
+            180,
+            400
+          ]
+        },
+        "transform": {
+          "position": [
+            0,
+            648,
+            -1345
+          ]
+        },
+        "material": "proj",
+        "notes": "sits on the plinth below the wall's bottom edge and throws up onto the film. Lens face at z=-1145 is exactly 450 mm from the pane, matching TR 0.25 for an 1800 mm wide image",
+        "annotation": {
+          "label": "Rear UST projector",
+          "detail": "drives SURFACE B\nlens 450 mm = TR 0.25",
+          "anchor": [
+            375,
+            0,
+            0
+          ],
+          "offset": [
+            1125,
+            12,
+            1045
+          ],
+          "side": "right"
+        }
+      },
+      {
+        "id": "down-projector",
+        "name": "Desk projector (procam)",
+        "type": "part",
+        "shape": "box",
+        "params": {
+          "size": [
+            400,
+            170,
+            320
+          ]
+        },
+        "transform": {
+          "position": [
+            0,
+            1960,
+            -160
+          ]
+        },
+        "material": "proj",
+        "notes": "procam head. Lens exits the underside at y=1875, a 1135 mm drop to the mat; a 0.93:1 short throw fills the mat's 1220 x 762 mm exactly. Centred on the mat at z=-160",
+        "annotation": {
+          "label": "Mat projector",
+          "detail": "drives SURFACE A\n1135 drop, 0.93:1 WUXGA",
+          "anchor": [
+            180,
+            0,
+            0
+          ],
+          "offset": [
+            1320,
+            -20,
+            -140
+          ],
+          "side": "right"
+        }
+      },
+      {
+        "id": "tof-overhead",
+        "name": "ToF depth camera - mat volume",
+        "type": "part",
+        "shape": "box",
+        "params": {
+          "size": [
+            115,
+            65,
+            40
+          ]
+        },
+        "transform": {
+          "position": [
+            0,
+            2012,
+            70
+          ]
+        },
+        "material": "sensor",
+        "notes": "Orbbec Femto Bolt, datasheet 115 x 40 x 65 mm. Looks straight down; WFOV 120x120 at the 1272 mm working distance covers 4406 mm, far more than the mat needs. Owns the hand while it is over the mat",
+        "annotation": {
+          "label": "Depth camera 1 (mat)",
+          "detail": "Femto Bolt, WFOV 120\nowns the hand over mat",
+          "offset": [
+            1500,
+            248,
+            -370
+          ],
+          "side": "right",
+          "color": "#8a4b1f"
+        }
+      },
+      {
+        "id": "tof-wall",
+        "name": "ToF depth camera - wall volume",
+        "type": "part",
+        "shape": "box",
+        "params": {
+          "size": [
+            115,
+            65,
+            40
+          ]
+        },
+        "transform": {
+          "position": [
+            0,
+            1958,
+            -655
+          ],
+          "rotation": [
+            -30,
+            0,
+            0
+          ]
+        },
+        "material": "sensor",
+        "notes": "second Femto Bolt on the wall bezel, raked 30 deg down and forward. Owns the hand as it approaches the glass, where the overhead camera only sees it edge-on. Its volume overlaps the overhead one through the transfer corridor so a dragged object never drops out of tracking",
+        "annotation": {
+          "label": "Depth camera 2 (wall)",
+          "detail": "Femto Bolt, raked 30\nowns the hand at glass",
+          "offset": [
+            1500,
+            -338,
+            355
+          ],
+          "side": "right",
+          "color": "#8a4b1f"
+        }
+      },
+      {
+        "id": "leap-controller",
+        "name": "Near-field hand tracker",
+        "type": "part",
+        "shape": "box",
+        "params": {
+          "size": [
+            84,
+            12,
+            20
+          ]
+        },
+        "transform": {
+          "position": [
+            0,
+            744,
+            310
+          ]
+        },
+        "material": "sensor",
+        "notes": "Ultraleap Leap Motion Controller 2, datasheet 84 x 20 x 12 mm. Aimed up from the desk front edge; its 160x160 FOV and 10-110 cm range resolve individual fingers, which is what actually detects the pinch. The ToF pair track gross hand position, this tracks the grip",
+        "annotation": {
+          "label": "Pinch detector",
+          "detail": "Ultraleap LMC2\nresolves fingers = pinch",
+          "anchor": [
+            42,
+            0,
+            0
+          ],
+          "offset": [
+            1458,
+            236,
+            -610
+          ],
+          "side": "right",
+          "color": "#8a4b1f"
+        }
+      }
+    ]
+  }
+}
