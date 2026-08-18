@@ -1,9 +1,9 @@
 # Alya (Roshidere) — 3D figure in colour: assembly report
 
 **Subject:** Alisa Mikhailovna Kujou, Seiren Academy winter uniform, single-view reconstruction.
-**Deliverable:** `C:\Users\Daniel\ForgeGen\out\alya-FINAL.glb` (textured, 2 materials)
-**Comparison image:** `C:\Users\Daniel\ForgeGen\out\alya-comparison.png`
-**Render evidence:** `C:\Users\Daniel\ForgeGen\out\alya-FINAL-renders\` (10 sheets)
+**Deliverable:** `<USER_HOME>\ForgeGen\out\alya-FINAL.glb` (textured, 2 materials)
+**Comparison image:** `<USER_HOME>\ForgeGen\out\alya-comparison.png`
+**Render evidence:** `<USER_HOME>\ForgeGen\out\alya-FINAL-renders\` (10 sheets)
 **Assembled by:** the assembler agent, 2026-08-05. CPU only — no GPU work, no regeneration.
 **Licensing:** copyrighted character art. Personal-use print/display only. Never publish, never sell.
 
@@ -23,7 +23,7 @@ figures side by side at matched height, front / right / back.
 
 Where the body-only version genuinely wins: **the back**. Body-only has one continuous pale hair
 mass down the back; the graft has the head's hair mass ending over the body's hair with a faint
-horizontal break. If Daniel only ever looks at this figure from behind, body-only is better. From
+horizontal break. If the user only ever looks at this figure from behind, body-only is better. From
 any other angle the graft wins outright.
 
 ---
@@ -63,9 +63,9 @@ s2026's 1,652.** The figure is still watertight (0 boundary edges) but this is t
 
 ```
 node graft-head.mjs
-  --body C:\Users\Daniel\ForgeGen\out\alya\FINAL\WINNER-body-alya-s99-512.glb
-  --head C:\Users\Daniel\ForgeGen\out\alya\FINAL\RUNNERUP-head-alya-s1234-512.glb
-  --outdir C:\Users\Daniel\ForgeGen\alya\work --name alya-final
+  --body <USER_HOME>\ForgeGen\out\alya\FINAL\WINNER-body-alya-s99-512.glb
+  --head <USER_HOME>\ForgeGen\out\alya\FINAL\RUNNERUP-head-alya-s1234-512.glb
+  --outdir <USER_HOME>\ForgeGen\alya\work --name alya-final
   --bodyCut 0.29  --bodySeed -0.0068,0.0411  --cutZ 0.5
   --headCut -0.32 --headSeed -0.0081,0.0199
   --scale 0.2578 --keepHair --hairTaper 0.30 --dy -0.030

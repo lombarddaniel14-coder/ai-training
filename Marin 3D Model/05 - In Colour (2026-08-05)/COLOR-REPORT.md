@@ -1,7 +1,7 @@
 # Marin Kitagawa — the figure IN COLOUR
 
-**Deliverable:** `C:\Users\Daniel\ForgeGen\out\marin-FINAL-COLOR.glb` — 10,322,620 bytes
-**Comparison image:** `C:\Users\Daniel\ForgeGen\out\marin-COLOR-comparison.png`
+**Deliverable:** `<USER_HOME>\ForgeGen\out\marin-FINAL-COLOR.glb` — 10,322,620 bytes
+**Comparison image:** `<USER_HOME>\ForgeGen\out\marin-COLOR-comparison.png`
 **Date:** 2026-08-05 · colour assembler · CPU only, no GPU run
 **Companion:** `out/FINAL-REPORT.md` (the grey figure this is derived from)
 
@@ -224,7 +224,7 @@ opposite (145k triangles against 813k) and rendered both in clay with the textur
 **Recommendation — treat them as two deliverables, not a replacement:**
 
 - **`marin-FINAL-COLOR.glb` is the definitive figure for VIEWING and for colour printing.** It is
-  what Daniel actually asked for, it is watertight, it stands, it beats the grey figure on
+  what the user actually asked for, it is watertight, it stands, it beats the grey figure on
   silhouette accuracy, and every colour on the brief is present.
 - **`marin-FINAL.glb` (grey) remains the reference for MONOCHROME FDM printing** if surface fidelity
   is the priority: solid, higher triangle density, more resolved cloth detail, larger contact patch.

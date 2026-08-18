@@ -1,7 +1,7 @@
 # Marin Kitagawa — final assembly report
 
-**Deliverable:** `C:\Users\Daniel\ForgeGen\out\marin-FINAL.glb`
-**Comparison image:** `C:\Users\Daniel\ForgeGen\out\marin-FINAL-comparison.png`
+**Deliverable:** `<USER_HOME>\ForgeGen\out\marin-FINAL.glb`
+**Comparison image:** `<USER_HOME>\ForgeGen\out\marin-FINAL-comparison.png`
 **Date:** 2026-08-05 · assembler agent · CPU only, no GPU run
 
 ---
